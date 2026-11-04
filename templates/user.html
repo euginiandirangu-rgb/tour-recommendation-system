@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KenyaGuide - User Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header i {
+            font-size: 48px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sidebar-header h3 {
+            margin-top: 12px;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .sidebar-nav {
+            padding: 0 15px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            margin: 5px 0;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(230, 126, 34, 0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav a.active {
+            background: linear-gradient(135deg, rgba(230, 126, 34, 0.2), rgba(243, 156, 18, 0.2));
+            color: white;
+            border-left: 3px solid #e67e22;
+        }
+
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 101;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 25px 30px;
+            transition: margin-left 0.3s ease;
+            background: #f0f2f5;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 18px 28px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(230, 126, 34, 0.3);
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 15px;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #e67e22;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 22px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-info h4 {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, rgba(230, 126, 34, 0.1), rgba(243, 156, 18, 0.1));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 28px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Tours Grid */
+        .tours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .tour-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .tour-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .tour-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tour-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .tour-card:hover .tour-image img {
+            transform: scale(1.05);
+        }
+
+        .tour-price {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tour-info {
+            padding: 20px;
+        }
+
+        .tour-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        .tour-destination {
+            color: #e67e22;
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tour-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .tour-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: #fbbf24;
+            font-size: 14px;
+        }
+
+        .tour-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-view, .btn-book {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .btn-view {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .btn-view:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+        }
+
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+        }
+
+        /* Search and Filters */
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #e67e22;
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #e67e22;
+        }
+
+        /* Bookings Table */
+        .bookings-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .bookings-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        .bookings-table th {
+            padding: 14px 12px;
+            text-align: left;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 13px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .bookings-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .bookings-table tbody tr:hover {
+            background: #f8fafc;
+            transition: background 0.3s ease;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-confirmed { background: #d1fae5; color: #059669; }
+        .status-completed { background: #dbeafe; color: #2563eb; }
+        .status-cancelled { background: #fee2e2; color: #dc2626; }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 22px 28px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 28px 28px 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e67e22;
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .rating-star {
+            font-size: 32px;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: all 0.3s ease;
+        }
+
+        .rating-star:hover,
+        .rating-star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #64748b;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #e67e22;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+        }
+
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.info { border-left: 4px solid #3b82f6; }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast.success i { color: #10b981; }
+        .toast.error i { color: #ef4444; }
+        .toast.info i { color: #3b82f6; }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .tours-grid {
+                grid-template-columns: 1fr;
+            }
+            .top-bar {
+                margin-top: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-compass"></i>
+                <h3>KenyaGuide</h3>
+                <p>🇰🇪 Safari Explorer</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a onclick="navigateTo('dashboard')" class="active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a onclick="navigateTo('search-tours')">
+                    <i class="fas fa-search"></i>
+                    <span>Search Tours</span>
+                </a>
+                <a onclick="navigateTo('my-bookings')">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>My Bookings</span>
+                </a>
+                <a onclick="navigateTo('my-reviews')">
+                    <i class="fas fa-star"></i>
+                    <span>My Reviews</span>
+                </a>
+                <a onclick="navigateTo('profile')">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h2 id="pageTitle">Dashboard</h2>
+                </div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Traveler</div>
+                        <div class="user-role">🇰🇪 Adventure Seeker</div>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div id="mainContent"></div>
+        </main>
+    </div>
+
+    <!-- Tour Details Modal -->
+    <div id="tourModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Tour Details</h3>
+                <span class="close-modal" onclick="closeModal('tourModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="tourModalBody"></div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-check"></i> Book Your Safari</h3>
+                <span class="close-modal" onclick="closeModal('bookingModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bookingTourId">
+                <div class="form-group">
+                    <label>Tour Name</label>
+                    <p id="bookingTourName" style="font-weight: 700; color: #e67e22; font-size: 18px;"></p>
+                </div>
+                <div class="form-group">
+                    <label>Number of Travelers</label>
+                    <input type="number" id="travelers" min="1" max="20" value="1" onchange="updateTotalPrice()">
+                </div>
+                <div class="form-group">
+                    <label>Booking Date</label>
+                    <input type="date" id="bookingDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Price per Person (KES)</label>
+                    <p id="pricePerPerson" style="font-weight: 700; font-size: 18px;"></p>
+                </div>
+                <div class="form-group">
+                    <label>Total Price (KES)</label>
+                    <h2 id="totalPrice" style="color: #e67e22; font-weight: 800;"></h2>
+                </div>
+                <div class="form-group">
+                    <label>Special Requests</label>
+                    <textarea id="specialRequests" rows="3" placeholder="Any special requests? Dietary restrictions, accessibility needs, etc."></textarea>
+                </div>
+                <button class="btn-submit" onclick="confirmBooking()">
+                    <i class="fas fa-check-circle"></i> Confirm Booking
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-star"></i> Share Your Safari Experience</h3>
+                <span class="close-modal" onclick="closeModal('reviewModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="reviewTourId">
+                <input type="hidden" id="ratingValue" value="0">
+                <div class="form-group">
+                    <label>Tour</label>
+                    <p id="reviewTourName" style="font-weight: 700; color: #e67e22;"></p>
+                </div>
+                <div class="form-group">
+                    <label>Your Rating</label>
+                    <div class="rating-stars">
+                        <i class="fas fa-star rating-star" onclick="setRating(1)"></i>
+                        <i class="fas fa-star rating-star" onclick="setRating(2)"></i>
+                        <i class="fas fa-star rating-star" onclick="setRating(3)"></i>
+                        <i class="fas fa-star rating-star" onclick="setRating(4)"></i>
+                        <i class="fas fa-star rating-star" onclick="setRating(5)"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Your Review</label>
+                    <textarea id="reviewComment" rows="4" placeholder="Share your safari experience with other travelers..."></textarea>
+                </div>
+                <button class="btn-submit" onclick="submitReview()">
+                    <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let authToken = localStorage.getItem('access_token');
+        let currentUser = null;
+        let currentSection = 'dashboard';
+
+        // Kenyan destinations data for fallback
+        const kenyanTours = [
+            { id: 1, name: 'Maasai Mara Safari', destination: 'Maasai Mara', price: 85000, duration_days: 3, rating: 4.9, image_url: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&h=400&fit=crop', description: 'Experience the Great Migration in the Maasai Mara, home to the Big Five.', category: 'adventure' },
+            { id: 2, name: 'Lake Nakuru Bird Watching', destination: 'Lake Nakuru', price: 45000, duration_days: 2, rating: 4.7, image_url: 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&h=400&fit=crop', description: 'See thousands of flamingos and rhinos at Lake Nakuru National Park.', category: 'nature' },
+            { id: 3, name: "Hell's Gate Cycling", destination: "Hell's Gate", price: 12000, duration_days: 1, rating: 4.5, image_url: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop', description: 'Cycle through geothermal valleys and spot wildlife in Hell\'s Gate.', category: 'adventure' },
+            { id: 4, name: 'Diani Beach Escape', destination: 'Diani Beach', price: 55000, duration_days: 4, rating: 4.8, image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop', description: 'Relax on the pristine white sands of Diani Beach with water sports.', category: 'relaxation' },
+            { id: 5, name: 'Amboseli Elephants', destination: 'Amboseli', price: 65000, duration_days: 3, rating: 4.9, image_url: 'https://images.unsplash.com/photo-1549366021-9f761d450615?w=600&h=400&fit=crop', description: 'See elephants with Mount Kilimanjaro in the background.', category: 'nature' },
+            { id: 6, name: 'Lamu Old Town', destination: 'Lamu', price: 40000, duration_days: 3, rating: 4.6, image_url: 'https://images.unsplash.com/photo-1590047096316-2ce8d7352539?w=600&h=400&fit=crop', description: 'Explore the UNESCO World Heritage site of Lamu Old Town.', category: 'cultural' },
+            { id: 7, name: 'Tsavo National Park', destination: 'Tsavo', price: 48000, duration_days: 3, rating: 4.5, image_url: 'https://images.unsplash.com/photo-1549366021-9f761d450615?w=600&h=400&fit=crop', description: 'Discover the largest national park in Kenya with diverse wildlife.', category: 'nature' },
+            { id: 8, name: 'Samburu Cultural Tour', destination: 'Samburu', price: 38000, duration_days: 2, rating: 4.4, image_url: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&h=400&fit=crop', description: 'Experience Samburu culture and unique wildlife species.', category: 'cultural' }
+        ];
+
+        async function apiCall(url, options = {}) {
+            const res = await fetch(url, {
+                ...options,
+                headers: { 'Authorization': `Bearer ${authToken}`, 'Content-Type': 'application/json' }
+            });
+            if (res.status === 401) {
+                localStorage.clear();
+                window.location.href = '/';
+                throw new Error('Unauthorized');
+            }
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Error');
+            }
+            return res.json();
+        }
+
+        function showToast(msg, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i> <span>${msg}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        function checkAuth() {
+            if (!authToken) {
+                window.location.href = '/';
+                return false;
+            }
+            const user = localStorage.getItem('user');
+            if (user) {
+                currentUser = JSON.parse(user);
+                if (currentUser.role === 'admin') {
+                    window.location.href = '/admin.html';
+                    return false;
+                }
+                document.getElementById('userName').textContent = currentUser.full_name;
+            }
+            return true;
+        }
+
+        function navigateTo(section) {
+            currentSection = section;
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.querySelector('span').innerText.toLowerCase().includes(section.replace('-', ' '))) {
+                    link.classList.add('active');
+                }
+            });
+            
+            const titles = {
+                'dashboard': 'Dashboard',
+                'search-tours': 'Search Tours',
+                'my-bookings': 'My Bookings',
+                'my-reviews': 'My Reviews',
+                'profile': 'My Profile'
+            };
+            document.getElementById('pageTitle').innerHTML = titles[section] || 'Dashboard';
+            
+            if (section === 'dashboard') loadDashboard();
+            else if (section === 'search-tours') loadSearchTours();
+            else if (section === 'my-bookings') loadMyBookings();
+            else if (section === 'my-reviews') loadMyReviews();
+            else if (section === 'profile') loadProfile();
+            
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        // Dashboard
+        async function loadDashboard() {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="stats-grid" id="statsGrid"><div class="loading"><div class="spinner"></div></div></div>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-star"></i> Recommended Kenyan Tours</h3>
+                        <button class="btn-view" onclick="navigateTo('search-tours')">View All →</button>
+                    </div>
+                    <div id="recommendedTours" class="tours-grid"><div class="loading"><div class="spinner"></div></div></div>
+                </div>
+            `;
+            await loadStats();
+            await loadRecommendedTours();
+        }
+
+        async function loadStats() {
+            try {
+                const data = await apiCall(`${API_BASE}/api/bookings`);
+                const bookings = data.bookings || [];
+                const totalBookings = bookings.length;
+                const completed = bookings.filter(b => b.status === 'completed').length;
+                const totalSpent = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+                const active = bookings.filter(b => b.status === 'pending' || b.status === 'confirmed').length;
+                
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h4>TOTAL BOOKINGS</h4>
+                            <div class="stat-number">${totalBookings}</div>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h4>COMPLETED SAFARIS</h4>
+                            <div class="stat-number">${completed}</div>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h4>TOTAL SPENT (KES)</h4>
+                            <div class="stat-number">${totalSpent.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-kenyan-shilling"></i></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h4>ACTIVE BOOKINGS</h4>
+                            <div class="stat-number">${active}</div>
+                        </div>
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('statsGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-chart-line"></i><p>Unable to load statistics</p></div>`;
+            }
+        }
+
+        async function loadRecommendedTours() {
+            try {
+                const res = await fetch(`${API_BASE}/api/tours`);
+                const data = await res.json();
+                const tours = (data.tours || kenyanTours).slice(0, 3);
+                const container = document.getElementById('recommendedTours');
+                if (tours.length) {
+                    container.innerHTML = tours.map(tour => renderTourCard(tour)).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-map-marked-alt"></i><p>No tours available</p></div>';
+                }
+            } catch (error) {
+                // Fallback to Kenyan tours
+                const container = document.getElementById('recommendedTours');
+                container.innerHTML = kenyanTours.slice(0, 3).map(tour => renderTourCard(tour)).join('');
+            }
+        }
+
+        // Search Tours
+        async function loadSearchTours() {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="content-card">
+                    <div class="card-header"><h3><i class="fas fa-search"></i> Discover Kenyan Adventures</h3></div>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search by destination or tour name..." onkeyup="debouncedSearch()">
+                        <select id="categoryFilter" class="filter-select" onchange="fetchTours()">
+                            <option value="">All Categories</option>
+                            <option value="adventure">🏔️ Adventure</option>
+                            <option value="nature">🌿 Wildlife & Nature</option>
+                            <option value="cultural">🏛️ Cultural</option>
+                            <option value="relaxation">🏖️ Beach & Relaxation</option>
+                        </select>
+                    </div>
+                    <div id="toursList" class="tours-grid"><div class="loading"><div class="spinner"></div></div></div>
+                </div>
+            `;
+            await fetchTours();
+        }
+
+        let searchTimeout;
+        function debouncedSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => fetchTours(), 500);
+        }
+
+        async function fetchTours() {
+            try {
+                const search = document.getElementById('searchInput')?.value || '';
+                const category = document.getElementById('categoryFilter')?.value || '';
+                let url = `${API_BASE}/api/tours`;
+                const params = new URLSearchParams();
+                if (search) params.append('search', search);
+                if (category) params.append('category', category);
+                if (params.toString()) url += `?${params.toString()}`;
+                
+                const res = await fetch(url);
+                const data = await res.json();
+                let tours = data.tours || [];
+                
+                // If no data from API, use Kenyan tours with filtering
+                if (!tours.length) {
+                    tours = kenyanTours.filter(t => {
+                        const matchSearch = !search || t.name.toLowerCase().includes(search.toLowerCase()) || t.destination.toLowerCase().includes(search.toLowerCase());
+                        const matchCategory = !category || t.category === category;
+                        return matchSearch && matchCategory;
+                    });
+                }
+                
+                const container = document.getElementById('toursList');
+                if (tours.length) {
+                    container.innerHTML = tours.map(tour => renderTourCard(tour)).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>No tours found</h3><p>Try adjusting your search criteria</p></div>';
+                }
+            } catch (error) {
+                // Fallback to Kenyan tours
+                const search = document.getElementById('searchInput')?.value || '';
+                const category = document.getElementById('categoryFilter')?.value || '';
+                const filtered = kenyanTours.filter(t => {
+                    const matchSearch = !search || t.name.toLowerCase().includes(search.toLowerCase()) || t.destination.toLowerCase().includes(search.toLowerCase());
+                    const matchCategory = !category || t.category === category;
+                    return matchSearch && matchCategory;
+                });
+                const container = document.getElementById('toursList');
+                if (filtered.length) {
+                    container.innerHTML = filtered.map(tour => renderTourCard(tour)).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>No tours found</h3><p>Try adjusting your search criteria</p></div>';
+                }
+            }
+        }
+
+        function renderTourCard(tour) {
+            const stars = '★'.repeat(Math.floor(tour.rating || 0)) + '☆'.repeat(5 - Math.floor(tour.rating || 0));
+            const priceDisplay = tour.price ? `KES ${tour.price.toLocaleString()}` : 'KES 0';
+            return `
+                <div class="tour-card">
+                    <div class="tour-image">
+                        <img src="${tour.image_url || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e'}" alt="${escapeHtml(tour.name)}">
+                        <div class="tour-price">${priceDisplay}</div>
+                    </div>
+                    <div class="tour-info">
+                        <h4 class="tour-title">${escapeHtml(tour.name)}</h4>
+                        <div class="tour-destination"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(tour.destination)}</div>
+                        <div class="tour-rating"><div class="stars">${stars}</div><span>(${tour.rating || 0})</span></div>
+                        <p class="tour-description">${escapeHtml((tour.description || '').substring(0, 100))}...</p>
+                        <div class="tour-actions">
+                            <button class="btn-view" onclick="viewTourDetails(${tour.id})"><i class="fas fa-info-circle"></i> Details</button>
+                            <button class="btn-book" onclick="showBookingModal(${tour.id}, '${escapeHtml(tour.name).replace(/'/g, "\\'")}', ${tour.price})"><i class="fas fa-calendar-check"></i> Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // View Tour Details
+        async function viewTourDetails(tourId) {
+            try {
+                const res = await fetch(`${API_BASE}/api/tours/${tourId}`);
+                const data = await res.json();
+                const tour = data.tour;
+                const reviews = data.reviews || [];
+                const stars = '★'.repeat(Math.floor(tour.rating || 0)) + '☆'.repeat(5 - Math.floor(tour.rating || 0));
+                
+                document.getElementById('tourModalBody').innerHTML = `
+                    <div style="margin-bottom:20px;"><img src="${tour.image_url || 'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e'}" style="width:100%; border-radius:16px;"></div>
+                    <h2>${escapeHtml(tour.name)}</h2>
+                    <p style="margin:10px 0;"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(tour.destination)}</p>
+                    <p><i class="fas fa-clock"></i> ${tour.duration_days} days</p>
+                    <p><i class="fas fa-tag"></i> <strong>KES ${tour.price ? tour.price.toLocaleString() : '0'}</strong> per person</p>
+                    <div class="tour-rating">${stars} (${tour.rating || 0})</div>
+                    <p><strong>Description:</strong> ${escapeHtml(tour.description)}</p>
+                    ${tour.highlights ? `<p><strong>✨ Highlights:</strong> ${escapeHtml(tour.highlights)}</p>` : ''}
+                    ${tour.included ? `<p><strong>✅ Included:</strong> ${escapeHtml(tour.included)}</p>` : ''}
+                    ${tour.excluded ? `<p><strong>❌ Excluded:</strong> ${escapeHtml(tour.excluded)}</p>` : ''}
+                    <p><strong>📊 Availability:</strong> ${tour.availability || '10'} spots left</p>
+                    <h4 style="margin-top:20px;">📝 Reviews (${reviews.length})</h4>
+                    ${reviews.length ? reviews.map(r => `<div style="border-bottom:1px solid #e2e8f0; padding:12px 0;"><strong>${escapeHtml(r.user_name)}</strong><div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div><p>${escapeHtml(r.comment)}</p><small>${new Date(r.created_at).toLocaleDateString()}</small></div>`).join('') : '<p>No reviews yet. Be the first!</p>'}
+                    <button class="btn-book" style="margin-top:20px; width:100%;" onclick="closeModal('tourModal'); showBookingModal(${tour.id}, '${escapeHtml(tour.name).replace(/'/g, "\\'")}', ${tour.price})">Book This Safari</button>
+                `;
+                showModal('tourModal');
+            } catch (error) {
+                // Fallback: find tour in Kenyan data
+                const tour = kenyanTours.find(t => t.id === tourId);
+                if (tour) {
+                    const stars = '★'.repeat(Math.floor(tour.rating || 0)) + '☆'.repeat(5 - Math.floor(tour.rating || 0));
+                    document.getElementById('tourModalBody').innerHTML = `
+                        <div style="margin-bottom:20px;"><img src="${tour.image_url}" style="width:100%; border-radius:16px;"></div>
+                        <h2>${escapeHtml(tour.name)}</h2>
+                        <p style="margin:10px 0;"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(tour.destination)}</p>
+                        <p><i class="fas fa-clock"></i> ${tour.duration_days} days</p>
+                        <p><i class="fas fa-tag"></i> <strong>KES ${tour.price.toLocaleString()}</strong> per person</p>
+                        <div class="tour-rating">${stars} (${tour.rating || 0})</div>
+                        <p><strong>Description:</strong> ${escapeHtml(tour.description)}</p>
+                        <button class="btn-book" style="margin-top:20px; width:100%;" onclick="closeModal('tourModal'); showBookingModal(${tour.id}, '${escapeHtml(tour.name).replace(/'/g, "\\'")}', ${tour.price})">Book This Safari</button>
+                    `;
+                    showModal('tourModal');
+                } else {
+                    showToast('Error loading tour details', 'error');
+                }
+            }
+        }
+
+        // My Bookings
+        async function loadMyBookings() {
+            document.getElementById('mainContent').innerHTML = `<div class="content-card"><div class="card-header"><h3><i class="fas fa-ticket-alt"></i> My Safari Bookings</h3></div><div id="bookingsList" class="bookings-table"><div class="loading"><div class="spinner"></div></div></div></div>`;
+            await fetchMyBookings();
+        }
+
+        async function fetchMyBookings() {
+            try {
+                const data = await apiCall(`${API_BASE}/api/bookings`);
+                const bookings = data.bookings || [];
+                const container = document.getElementById('bookingsList');
+                if (bookings.length) {
+                    container.innerHTML = `<table><thead><tr><th>ID</th><th>Safari</th><th>Destination</th><th>Date</th><th>Travelers</th><th>Total (KES)</th><th>Status</th><th>Action</th></tr></thead><tbody>${bookings.map(b => `<tr><td>${b.id}</td><td><strong>${escapeHtml(b.tour_name)}</strong></td><td>${escapeHtml(b.destination)}</td><td>${new Date(b.booking_date).toLocaleDateString()}</td><td>${b.travelers}</td><td>${b.total_price ? b.total_price.toLocaleString() : '0'}</td><td><span class="status-badge status-${b.status}">${b.status}</span></td><td>${b.status === 'pending' ? `<button class="btn-cancel" onclick="cancelBooking(${b.id})">Cancel</button>` : '-'}</td></tr>`).join('')}</tbody></table>`;
+                } else {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-ticket-alt"></i><h3>No bookings yet</h3><p>Start exploring Kenyan safaris to make your first booking!</p></div>';
+                }
+            } catch (error) {
+                document.getElementById('bookingsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading bookings</p></div>';
+            }
+        }
+
+        async function cancelBooking(bookingId) {
+            if (!confirm('Cancel this booking?')) return;
+            try {
+                await apiCall(`${API_BASE}/api/bookings/${bookingId}/cancel`, { method: 'PUT' });
+                showToast('Booking cancelled', 'success');
+                fetchMyBookings();
+                if (currentSection === 'dashboard') loadStats();
+            } catch (error) {
+                showToast('Error cancelling booking', 'error');
+            }
+        }
+
+        // My Reviews
+        async function loadMyReviews() {
+            document.getElementById('mainContent').innerHTML = `<div class="content-card"><div class="card-header"><h3><i class="fas fa-star"></i> Share Your Safari Experience</h3></div><div id="reviewsList"><div class="loading"><div class="spinner"></div></div></div></div>`;
+            try {
+                const data = await apiCall(`${API_BASE}/api/bookings`);
+                const completedBookings = (data.bookings || []).filter(b => b.status === 'completed');
+                if (completedBookings.length) {
+                    document.getElementById('reviewsList').innerHTML = `<div class="tours-grid">${completedBookings.map(b => `<div class="tour-card"><div class="tour-info"><h4>${escapeHtml(b.tour_name)}</h4><p><i class="fas fa-map-marker-alt"></i> ${escapeHtml(b.destination)}</p><p><strong>Traveled:</strong> ${new Date(b.booking_date).toLocaleDateString()}</p><button class="btn-book" onclick="showReviewModal(${b.tour_id}, '${escapeHtml(b.tour_name).replace(/'/g, "\\'")}')">Write a Review</button></div></div>`).join('')}</div>`;
+                } else {
+                    document.getElementById('reviewsList').innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><h3>No completed safaris yet</h3><p>Complete a safari to leave a review!</p></div>';
+                }
+            } catch (error) {
+                document.getElementById('reviewsList').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading reviews</p></div>';
+            }
+        }
+
+        // Profile
+        async function loadProfile() {
+            try {
+                const data = await apiCall(`${API_BASE}/api/profile`);
+                const user = data.user;
+                document.getElementById('mainContent').innerHTML = `
+                    <div class="content-card">
+                        <div class="card-header"><h3><i class="fas fa-user-circle"></i> My Profile</h3></div>
+                        <form id="profileForm">
+                            <div class="form-group"><label>Full Name</label><input type="text" id="profileName" value="${escapeHtml(user.full_name || '')}" required></div>
+                            <div class="form-group"><label>Email</label><input type="email" value="${escapeHtml(user.email || '')}" disabled style="background:#f1f5f9;"></div>
+                            <div class="form-group"><label>Phone Number</label><input type="tel" id="profilePhone" value="${escapeHtml(user.phone || '')}"></div>
+                            <div class="form-group"><label>Member Since</label><input type="text" value="${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}" disabled style="background:#f1f5f9;"></div>
+                            <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Update Profile</button>
+                        </form>
+                    </div>
+                `;
+                document.getElementById('profileForm').addEventListener('submit', updateProfile);
+            } catch (error) {
+                document.getElementById('mainContent').innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading profile</p></div>';
+            }
+        }
+
+        async function updateProfile(e) {
+            e.preventDefault();
+            try {
+                await apiCall(`${API_BASE}/api/profile`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        full_name: document.getElementById('profileName').value,
+                        phone: document.getElementById('profilePhone').value
+                    })
+                });
+                showToast('Profile updated', 'success');
+                const user = JSON.parse(localStorage.getItem('user'));
+                user.full_name = document.getElementById('profileName').value;
+                localStorage.setItem('user', JSON.stringify(user));
+                document.getElementById('userName').textContent = user.full_name;
+            } catch (error) {
+                showToast('Error updating profile', 'error');
+            }
+        }
+
+        // Booking Functions
+        function showBookingModal(tourId, tourName, price) {
+            document.getElementById('bookingTourId').value = tourId;
+            document.getElementById('bookingTourName').textContent = tourName;
+            document.getElementById('pricePerPerson').textContent = `KES ${price ? price.toLocaleString() : '0'}`;
+            document.getElementById('totalPrice').textContent = `KES ${price ? price.toLocaleString() : '0'}`;
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('bookingDate').value = tomorrow.toISOString().split('T')[0];
+            document.getElementById('bookingDate').min = tomorrow.toISOString().split('T')[0];
+            document.getElementById('travelers').value = 1;
+            document.getElementById('specialRequests').value = '';
+            showModal('bookingModal');
+        }
+
+        function updateTotalPrice() {
+            const travelers = parseInt(document.getElementById('travelers').value) || 1;
+            const priceText = document.getElementById('pricePerPerson').textContent.replace('KES ', '').replace(/,/g, '');
+            const price = parseInt(priceText) || 0;
+            document.getElementById('totalPrice').textContent = `KES ${(price * travelers).toLocaleString()}`;
+        }
+
+        async function confirmBooking() {
+            const tourId = document.getElementById('bookingTourId').value;
+            const travelers = parseInt(document.getElementById('travelers').value);
+            const bookingDate = document.getElementById('bookingDate').value;
+            const specialRequests = document.getElementById('specialRequests').value;
+            const priceText = document.getElementById('pricePerPerson').textContent.replace('KES ', '').replace(/,/g, '');
+            const price = parseInt(priceText) || 0;
+            const totalPrice = price * travelers;
+            
+            if (!bookingDate) { showToast('Select a date', 'error'); return; }
+            if (travelers < 1) { showToast('Enter valid travelers', 'error'); return; }
+            
+            try {
+                await apiCall(`${API_BASE}/api/bookings`, {
+                    method: 'POST',
+                    body: JSON.stringify({ tour_id: parseInt(tourId), travelers, booking_date: bookingDate, total_price: totalPrice, special_requests: specialRequests })
+                });
+                showToast('Booking confirmed!', 'success');
+                closeModal('bookingModal');
+                if (currentSection === 'dashboard') loadDashboard();
+                else navigateTo('my-bookings');
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // Review Functions
+        function showReviewModal(tourId, tourName) {
+            document.getElementById('reviewTourId').value = tourId;
+            document.getElementById('reviewTourName').textContent = tourName;
+            document.getElementById('ratingValue').value = 0;
+            document.querySelectorAll('.rating-star').forEach(star => star.classList.remove('active'));
+            document.getElementById('reviewComment').value = '';
+            showModal('reviewModal');
+        }
+
+        function setRating(rating) {
+            document.getElementById('ratingValue').value = rating;
+            document.querySelectorAll('.rating-star').forEach((star, i) => {
+                if (i < rating) star.classList.add('active');
+                else star.classList.remove('active');
+            });
+        }
+
+        async function submitReview() {
+            const tourId = document.getElementById('reviewTourId').value;
+            const rating = document.getElementById('ratingValue').value;
+            const comment = document.getElementById('reviewComment').value;
+            
+            if (rating === '0') { showToast('Select a rating', 'error'); return; }
+            if (!comment.trim()) { showToast('Write a review', 'error'); return; }
+            
+            try {
+                await apiCall(`${API_BASE}/api/reviews`, {
+                    method: 'POST',
+                    body: JSON.stringify({ tour_id: parseInt(tourId), rating: parseInt(rating), comment })
+                });
+                showToast('Review submitted!', 'success');
+                closeModal('reviewModal');
+                navigateTo('my-reviews');
+            } catch (error) {
+                showToast('Error submitting review', 'error');
+            }
+        }
+
+        function escapeHtml(s) { if (!s) return ''; return String(s).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        
+        function logout() { localStorage.clear(); window.location.href = '/'; }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (checkAuth()) {
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const text = link.querySelector('span').innerText.toLowerCase();
+                    if (text.includes('dashboard')) navigateTo('dashboard');
+                    else if (text.includes('search')) navigateTo('search-tours');
+                    else if (text.includes('booking')) navigateTo('my-bookings');
+                    else if (text.includes('review')) navigateTo('my-reviews');
+                    else if (text.includes('profile')) navigateTo('profile');
+                });
+            });
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>
